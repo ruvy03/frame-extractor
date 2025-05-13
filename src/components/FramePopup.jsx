@@ -1,7 +1,14 @@
 import { ArrowLeft, ArrowRight, Download, X } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const FramePopup = ({ frame, index, frames, onClose, onNavigate }) => {
+  const [sliderValue, setSliderValue] = useState(index);
+
+  // Update slider when index changes from outside
+  useEffect(() => {
+    setSliderValue(index);
+  }, [index]);
+
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = frame;
@@ -17,6 +24,19 @@ const FramePopup = ({ frame, index, frames, onClose, onNavigate }) => {
 
   const goToNextFrame = () => {
     onNavigate(index + 1);
+  };
+
+  // Handle slider change
+  const handleSliderChange = (e) => {
+    const newIndex = parseInt(e.target.value, 10);
+    setSliderValue(newIndex);
+  };
+
+  // When slider is released, navigate to the frame
+  const handleSliderChangeComplete = () => {
+    if (sliderValue !== index) {
+      onNavigate(sliderValue);
+    }
   };
 
   // Handle keyboard navigation
@@ -42,7 +62,10 @@ const FramePopup = ({ frame, index, frames, onClose, onNavigate }) => {
   }, [index, frames.length]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+    >
       <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-full overflow-hidden relative">
         <div className="p-4 flex justify-between items-center border-b border-gray-800">
           <h3 className="text-xl font-semibold text-white">
@@ -92,7 +115,26 @@ const FramePopup = ({ frame, index, frames, onClose, onNavigate }) => {
             </button>
           )}
         </div>
-
+        {/* Timeline slider */}
+        <div className="p-4 border-t border-gray-800">
+          <div className="flex items-center space-x-3">
+            <span className="text-sm text-gray-400">1</span>
+            <input
+              type="range"
+              min={0}
+              max={frames.length - 1}
+              value={sliderValue}
+              onChange={handleSliderChange}
+              onMouseUp={handleSliderChangeComplete}
+              onTouchEnd={handleSliderChangeComplete}
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+            />
+            <span className="text-sm text-gray-400">{frames.length}</span>
+          </div>
+          <div className="text-center text-xs text-gray-400 mt-1">
+            Frame {sliderValue + 1} / {frames.length}
+          </div>
+        </div>
         <div className="p-3 border-t border-gray-800 flex justify-between">
           <button
             onClick={goToPrevFrame}
