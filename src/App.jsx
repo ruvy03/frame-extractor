@@ -23,6 +23,7 @@ export default function FrameExtractor() {
   const [selectedFrame, setSelectedFrame] = useState(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(true);
   const [selectedFrames, setSelectedFrames] = useState(new Set());
+  const [maxFrames, setMaxFrames] = useState(240);
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -63,7 +64,7 @@ export default function FrameExtractor() {
         const ctx = canvas.getContext("2d");
 
         // Set frame extraction interval based on video length
-        const frameInterval = Math.max(0.1, duration / 240); // Max 240 frames
+        const frameInterval = Math.max(0.1, duration / maxFrames);
         let currentTime = 0;
         const tempFrames = [];
 
@@ -267,6 +268,26 @@ export default function FrameExtractor() {
           )}
         </div>
       )}
+
+      {/* Max frames */}
+
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <label htmlFor="maxFrames" className="text-sm text-purple-300">
+            Max frames to extract:
+          </label>
+          <input
+            id="maxFrames"
+            type="number"
+            min={1}
+            max={1000}
+            value={maxFrames}
+            onChange={(e) => setMaxFrames(Number(e.target.value))}
+            className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm w-24"
+            disabled={isExtracting}
+          />
+        </div>
+      </div>
 
       {/* Progress bar */}
       {isExtracting && (
